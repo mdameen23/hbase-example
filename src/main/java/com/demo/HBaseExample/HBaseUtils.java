@@ -62,6 +62,24 @@ public class HBaseUtils {
         }
     }
 
+    public void dropTable(String tableName) {
+        try {
+            logger.info("Checking table: " + tableName);
+            if (!admin.tableExists(tableName)) {
+                logger.info("table '" + tableName + "' not found");
+                return;
+            }
+
+            admin.disableTable(tableName);
+
+            admin.deleteTable(tableName);
+
+            logger.info("table: '" + tableName + "' dropped");
+        } catch (Exception ex) {
+            logger.info("Exception while drop table: " + ex.toString());
+        }
+    }
+
     public void scanTable(String tableName) {
         try {
             theTable = connection.getTable(tableName);
@@ -69,7 +87,7 @@ public class HBaseUtils {
             scan.addColumn(Bytes.toBytes("views"), Bytes.toBytes("total_views"));
             ResultScanner rScanner = theTable.getScanner(scan);
             for (Result result = rScanner.next(); (result != null); result = rScanner.next()) {
-            	logger.info("Row: " + result);
+                logger.info("Row: " + result);
             }
             rScanner.close();
         } catch (Exception ex) {
