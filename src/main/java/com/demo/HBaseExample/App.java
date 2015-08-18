@@ -19,5 +19,8 @@ public class App
             System.out.println(ex.toString());
             return;
         }
+		
+		HBaseUtils hUtils = new HBaseUtils();
+		hUtils.checkTable("page_views");
     }
 }
