@@ -1,5 +1,9 @@
 package com.demo.HBaseExample;
 
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.NavigableMap;
+
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
@@ -17,7 +21,6 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.conf.Configuration;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -69,16 +72,29 @@ public class HBaseUtils {
         try {
             theTable = connection.getTable(tableName);
             Scan scan = new Scan();
-            scan.addColumn(Bytes.toBytes("views"), Bytes.toBytes("total_views"));
-            ResultScanner scanner = theTable.getScanner(scan);
-            for (Result result = scanner.next(); result != null; result = scanner.next()) {
-                logger.info("Row: " + result);
-                Cell c = result.getColumnLatestCell(Bytes.toBytes("views"), Bytes.toBytes("total_views"));
-                byte[] value = c.getValueArray();
-                String valueStr = Bytes.toString(value);
-                logger.info("RowValue: " + valueStr);
+            scan.addFamily(Bytes.toBytes("views"));
+            ResultScanner rScanner = theTable.getScanner(scan);
+            Iterator<Result> rsItr = rScanner.iterator();
+            while (rsItr.hasNext()) {
+                Result nextRes = rsItr.next();    
+                for(Entry<byte[], NavigableMap<byte[], NavigableMap<Long, byte[]>>> columnFamilyMap : nextRes.getMap().entrySet())
+                {
+                    for (Entry<byte[], NavigableMap<Long, byte[]>> entryVersion : columnFamilyMap.getValue().entrySet())
+                    {
+                        for (Entry<Long, byte[]> entry : entryVersion.getValue().entrySet())
+                        {
+                            String row = Bytes.toString(nextRes.getRow());
+                            String column = Bytes.toString(entryVersion.getKey());
+                            byte[] value = entry.getValue();
+                            long timesstamp = entry.getKey();
+                            
+                            String valueStr = Bytes.toString(value);
+                            logger.info("RowValue: " + valueStr);
+                        }
+                    }
+                }
             }
-            scanner.close();
+            rScanner.close();
         } catch (Exception ex) {
             logger.info("Exception while scan: " + ex.toString());
         }
