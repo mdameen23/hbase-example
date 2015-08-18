@@ -73,7 +73,7 @@ public class HBaseUtils {
             ResultScanner scanner = theTable.getScanner(scan);
             for (Result result = scanner.next(); result != null; result = scanner.next()) {
                 logger.info("Row: " + result);
-                KeyValue kv = result.getColumnLatest("views", "total_views");
+                KeyValue kv = result.getColumnLatest(Bytes.toBytes("views"), Bytes.toBytes("total_views"));
                 byte[] value = kv.getValue();
                 String valueStr = Bytes.toString(value);
                 logger.info("RowValue: " + valueStr);
