@@ -11,6 +11,9 @@ import org.apache.hadoop.hbase.client.HConnection;
 import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.conf.Configuration;
 
@@ -58,6 +61,21 @@ public class HBaseUtils {
             logger.info("table: '" + tableName + "' created");
         } catch (Exception ex) {
             logger.info("Exception while check table: " + ex.toString());
+        }
+    }
+
+    public void scanTable(String tableName) {
+        try {
+            theTable = connection.getTable(tableName);
+            Scan scan = new Scan();
+            scan.addColumn(Bytes.toBytes("page_views"), Bytes.toBytes("views"));
+            ResultScanner scanner = table.getScanner(scan);
+            for (Result result = scanner.next(); result != null; result = scanner.next()) {
+                logger.info("Row: " + result);
+            }
+            scanner.close();
+        } catch (Exception ex) {
+            logger.info("Exception: " + ex.toString());
         }
     }
 
