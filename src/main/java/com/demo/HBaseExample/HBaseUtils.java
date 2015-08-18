@@ -68,14 +68,14 @@ public class HBaseUtils {
         try {
             theTable = connection.getTable(tableName);
             Scan scan = new Scan();
-            scan.addColumn(Bytes.toBytes("page_views"), Bytes.toBytes("views"));
+            scan.addColumn(Bytes.toBytes("views"), Bytes.toBytes("total_views"));
             ResultScanner scanner = theTable.getScanner(scan);
             for (Result result = scanner.next(); result != null; result = scanner.next()) {
                 logger.info("Row: " + result);
             }
             scanner.close();
         } catch (Exception ex) {
-            logger.info("Exception: " + ex.toString());
+            logger.info("Exception while scan: " + ex.toString());
         }
     }
 
@@ -88,7 +88,7 @@ public class HBaseUtils {
             theTable.incrementColumnValue(Bytes.toBytes(rowKey), Bytes.toBytes(colFamily), Bytes.toBytes(col), 1L);
             theTable.close();
         } catch (Exception ex) {
-            logger.info("Exception: " + ex.toString());
+            logger.info("Exception while increment: " + ex.toString());
         }
     }
 
