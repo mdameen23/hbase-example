@@ -1,21 +1,20 @@
 package com.demo.HBaseExample;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.KeyValue;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HConnection;
 import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.apache.hadoop.hbase.client.HTableInterface;
+import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -67,12 +66,11 @@ public class HBaseUtils {
         try {
             theTable = connection.getTable(tableName);
             Scan scan = new Scan();
-            scan.addFamily(Bytes.toBytes("views"));
+            scan.addColumn(Bytes.toBytes("views"), Bytes.toBytes("total_views"));
             ResultScanner rScanner = theTable.getScanner(scan);
             for (Result result = rScanner.next(); (result != null); result = rScanner.next()) {
-                for(KeyValue keyValue : result.list()) {
-                    logger.info("Qualifier : " + keyValue.getKeyString() + " : Value : " + Bytes.toString(keyValue.getValue()));
-                }
+            	byte[] val = result.getValue(Bytes.toBytes("views"), Bytes.toBytes("total_views"));
+            	logger.info("Value: " + Bytes.toString(val));
             }
             rScanner.close();
         } catch (Exception ex) {
