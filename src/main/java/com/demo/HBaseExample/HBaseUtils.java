@@ -15,7 +15,7 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.KeyValue;
+import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.conf.Configuration;
 
 import org.apache.log4j.LogManager;
@@ -73,8 +73,8 @@ public class HBaseUtils {
             ResultScanner scanner = theTable.getScanner(scan);
             for (Result result = scanner.next(); result != null; result = scanner.next()) {
                 logger.info("Row: " + result);
-                KeyValue kv = result.getColumnLatest(Bytes.toBytes("views"), Bytes.toBytes("total_views"));
-                byte[] value = kv.getValue();
+                Cell c = result.getColumnLatestCell(Bytes.toBytes("views"), Bytes.toBytes("total_views"));
+                byte[] value = c.getValueArray();
                 String valueStr = Bytes.toString(value);
                 logger.info("RowValue: " + valueStr);
             }
