@@ -69,7 +69,7 @@ public class HBaseUtils {
             theTable = connection.getTable(tableName);
             Scan scan = new Scan();
             scan.addColumn(Bytes.toBytes("page_views"), Bytes.toBytes("views"));
-            ResultScanner scanner = table.getScanner(scan);
+            ResultScanner scanner = theTable.getScanner(scan);
             for (Result result = scanner.next(); result != null; result = scanner.next()) {
                 logger.info("Row: " + result);
             }
