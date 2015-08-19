@@ -16,7 +16,7 @@ public class App
         Properties props = new Properties();
         try {
             logger.debug("Loading Properties for HBase");
-            props.load(new FileInputStream("src/main/resources/hbase.properties"));
+            props.load(new FileInputStream("src/main/re-sources/hbase.properties"));
         } catch(IOException ex)
         {
             System.out.println(ex.toString());
@@ -24,8 +24,13 @@ public class App
         }
 
         HBaseUtils hUtils = new HBaseUtils();
-        hUtils.checkTable("page_views");
+        //hUtils.checkTable("/user/root/page_views");
+        
+        hUtils.increment_col("/user/root/page_views", 
+                             "http://www.acme.com/SH55126545/VD55179433",
+                             "views",
+                             "total_views");
 
-        hUtils.scanTable("page_views");
+        hUtils.scanTable("/user/root/page_views");
     }
 }

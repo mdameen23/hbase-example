@@ -14,6 +14,15 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>mapr-maven</id>
+            <url>http://repository.mapr.com/maven</url>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -36,8 +45,8 @@
 
         <dependency>
             <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-client</artifactId>
-            <version>0.98.12-hadoop2</version>
+            <artifactId>hbase</artifactId>
+            <version>0.94.13-mapr-1401-m7-3.1.0</version>
         </dependency>
 
     </dependencies>

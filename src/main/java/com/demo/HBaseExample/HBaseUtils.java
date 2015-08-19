@@ -7,8 +7,6 @@ import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.apache.hadoop.hbase.client.HConnection;
-import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
@@ -23,21 +21,19 @@ public class HBaseUtils {
     private static Logger logger = LogManager.getLogger(HBaseUtils.class.getName());
 
     private Configuration hConfig;
-    private HConnection connection;
     private HTableInterface theTable;
     private HBaseAdmin admin;
 
     public HBaseUtils() {
         try {
             hConfig = HBaseConfiguration.create();
-            hConfig.set("hbase.zookeeper.quorum", "maprdemo");
-            hConfig.set("hbase.zookeeper.property.clientPort", "5181");
-            hConfig.set("hbase.rootdir", "maprfs:///hbase");
-            hConfig.set("hbase.cluster.distributed", "true");
-            hConfig.set("dfs.support.append", "true");
-            hConfig.set("hbase.fsutil.maprfs.impl", "org.apache.hadoop.hbase.util.FSMapRUtils");
+            //hConfig.set("hbase.zookeeper.quorum", "maprdemo");
+            //hConfig.set("hbase.zookeeper.property.clientPort", "5181");
+            //hConfig.set("hbase.rootdir", "maprfs:///hbase");
+            //hConfig.set("hbase.cluster.distributed", "true");
+            //hConfig.set("dfs.support.append", "true");
+            //hConfig.set("hbase.fsutil.maprfs.impl", "org.apache.hadoop.hbase.util.FSMapRUtils");
 
-            connection = HConnectionManager.createConnection(hConfig);
             admin = new HBaseAdmin(hConfig);
         } catch (Exception ex) {
             logger.info("Exception while init: " + ex.toString());
@@ -82,6 +78,7 @@ public class HBaseUtils {
 
     public void scanTable(String tableName) {
         try {
+            HTable theTable = new HTable(conf, tableName);
             theTable = connection.getTable(tableName);
             Scan scan = new Scan();
             scan.addColumn(Bytes.toBytes("views"), Bytes.toBytes("total_views"));
@@ -100,7 +97,7 @@ public class HBaseUtils {
 
         try {
             logger.info("Increment on: " + tableName + " -> " + rowKey + " " + colFamily + ":" + col);
-            theTable = connection.getTable(tableName);
+            HTable theTable = new HTable(conf, tableName);
             theTable.incrementColumnValue(Bytes.toBytes(rowKey), Bytes.toBytes(colFamily), Bytes.toBytes(col), 1L);
             theTable.close();
         } catch (Exception ex) {
@@ -112,7 +109,7 @@ public class HBaseUtils {
                           String col, String val) throws Exception {
 
         logger.info("Put on: " + tableName + " -> " + rowKey + " " + colFamily + ":" + col + " = " + val);
-        theTable = connection.getTable(tableName);
+        HTable theTable = new HTable(conf, tableName);
         Put p = new Put(Bytes.toBytes(rowKey));
         p.add(Bytes.toBytes(colFamily), Bytes.toBytes(col),Bytes.toBytes(val));
         theTable.put(p);
@@ -123,7 +120,7 @@ public class HBaseUtils {
             String col) throws Exception {
 
         logger.info("Get on: " + tableName + " -> " + rowKey + " " + colFamily + ":" + col);
-        theTable = connection.getTable(tableName);
+        HTable theTable = new HTable(conf, tableName);
         Get g = new Get(Bytes.toBytes(rowKey));
         Result r = theTable.get(g);
         byte[] value = r.getValue(Bytes.toBytes(colFamily), Bytes.toBytes(col));
