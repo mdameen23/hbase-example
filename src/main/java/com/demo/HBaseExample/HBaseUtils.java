@@ -78,8 +78,7 @@ public class HBaseUtils {
 
     public void scanTable(String tableName) {
         try {
-            HTable theTable = new HTable(conf, tableName);
-            theTable = connection.getTable(tableName);
+            HTable theTable = new HTable(hConfig, tableName);
             Scan scan = new Scan();
             scan.addColumn(Bytes.toBytes("views"), Bytes.toBytes("total_views"));
             ResultScanner rScanner = theTable.getScanner(scan);
@@ -97,7 +96,7 @@ public class HBaseUtils {
 
         try {
             logger.info("Increment on: " + tableName + " -> " + rowKey + " " + colFamily + ":" + col);
-            HTable theTable = new HTable(conf, tableName);
+            HTable theTable = new HTable(hConfig, tableName);
             theTable.incrementColumnValue(Bytes.toBytes(rowKey), Bytes.toBytes(colFamily), Bytes.toBytes(col), 1L);
             theTable.close();
         } catch (Exception ex) {
@@ -109,7 +108,7 @@ public class HBaseUtils {
                           String col, String val) throws Exception {
 
         logger.info("Put on: " + tableName + " -> " + rowKey + " " + colFamily + ":" + col + " = " + val);
-        HTable theTable = new HTable(conf, tableName);
+        HTable theTable = new HTable(hConfig, tableName);
         Put p = new Put(Bytes.toBytes(rowKey));
         p.add(Bytes.toBytes(colFamily), Bytes.toBytes(col),Bytes.toBytes(val));
         theTable.put(p);
