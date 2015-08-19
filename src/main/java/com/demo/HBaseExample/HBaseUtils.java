@@ -8,6 +8,7 @@ import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTableInterface;
+import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
@@ -119,7 +120,7 @@ public class HBaseUtils {
             String col) throws Exception {
 
         logger.info("Get on: " + tableName + " -> " + rowKey + " " + colFamily + ":" + col);
-        HTable theTable = new HTable(conf, tableName);
+        HTable theTable = new HTable(hConfig, tableName);
         Get g = new Get(Bytes.toBytes(rowKey));
         Result r = theTable.get(g);
         byte[] value = r.getValue(Bytes.toBytes(colFamily), Bytes.toBytes(col));
