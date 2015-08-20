@@ -128,7 +128,7 @@ public class HBaseUtils {
             Get g = new Get(Bytes.toBytes(rowKey));
             Result r = theTable.get(g);
             byte[] value = r.getValue(Bytes.toBytes(colFamily), Bytes.toBytes(col));
-            retVal = Bytes.toString(value);
+            retVal = Long.toString(Bytes.toLong(value));
             logger.info("Got Value: " + retVal);
             theTable.close();
         } catch (Exception ex) {
