@@ -129,6 +129,7 @@ public class HBaseUtils {
             Result r = theTable.get(g);
             byte[] value = r.getValue(Bytes.toBytes(colFamily), Bytes.toBytes(col));
             retVal = Bytes.toString(value);
+            logger.info("Got Value: " + retVal);
             theTable.close();
         } catch (Exception ex) {
             logger.info("Exception while get: " + ex.toString());
