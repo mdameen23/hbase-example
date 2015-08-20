@@ -81,7 +81,6 @@ public class HBaseUtils {
             scan.addColumn(Bytes.toBytes("views"), Bytes.toBytes("total_views"));
             ResultScanner rScanner = theTable.getScanner(scan);
             for (Result result = rScanner.next(); (result != null); result = rScanner.next()) {
-                logger.info("Row: " + result);
                 byte[] rowB = result.getRow();
                 String strRow = Bytes.toString(rowB);
                 byte[] resB = result.getValue(Bytes.toBytes("views"), Bytes.toBytes("total_views"));
