@@ -82,6 +82,11 @@ public class HBaseUtils {
             ResultScanner rScanner = theTable.getScanner(scan);
             for (Result result = rScanner.next(); (result != null); result = rScanner.next()) {
                 logger.info("Row: " + result);
+                byte[] rowB = result.getRow();
+                String strRow = Bytes.toString(rowB);
+                byte[] resB = result.getValue(Bytes.toBytes("views"), Bytes.toBytes("total_views"));
+                String strVal = Long.toString(Bytes.toLong(resB));
+                logger.info("Row: " + strRow + " = " + strVal);
             }
             theTable.close();
             rScanner.close();
