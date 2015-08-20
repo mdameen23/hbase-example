@@ -4,10 +4,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
@@ -22,7 +20,6 @@ public class HBaseUtils {
     private static Logger logger = LogManager.getLogger(HBaseUtils.class.getName());
 
     private Configuration hConfig;
-    private HTableInterface theTable;
     private HBaseAdmin admin;
 
     public HBaseUtils() {
@@ -86,6 +83,7 @@ public class HBaseUtils {
             for (Result result = rScanner.next(); (result != null); result = rScanner.next()) {
                 logger.info("Row: " + result);
             }
+            theTable.close();
             rScanner.close();
         } catch (Exception ex) {
             logger.info("Exception while scan: " + ex.toString());
@@ -105,27 +103,36 @@ public class HBaseUtils {
         }
     }
 
-    public void table_put(String tableName, String rowKey, String colFamily,
-                          String col, String val) throws Exception {
+    public void table_put(String tableName, String rowKey,
+                          String colFamily, String col, String val)  {
 
-        logger.info("Put on: " + tableName + " -> " + rowKey + " " + colFamily + ":" + col + " = " + val);
-        HTable theTable = new HTable(hConfig, tableName);
-        Put p = new Put(Bytes.toBytes(rowKey));
-        p.add(Bytes.toBytes(colFamily), Bytes.toBytes(col),Bytes.toBytes(val));
-        theTable.put(p);
-        theTable.close();
+        try {
+            logger.info("Put on: " + tableName + " -> " + rowKey + " " + colFamily + ":" + col + " = " + val);
+            HTable theTable = new HTable(hConfig, tableName);
+            Put p = new Put(Bytes.toBytes(rowKey));
+            p.add(Bytes.toBytes(colFamily), Bytes.toBytes(col),Bytes.toBytes(val));
+            theTable.put(p);
+            theTable.close();
+        } catch (Exception ex) {
+            logger.info("Exception while put: " + ex.toString());
+        }
     }
 
-    public String table_get(String tableName, String rowKey, String colFamily,
-            String col) throws Exception {
+    public String table_get(String tableName, String rowKey,
+                            String colFamily, String col) {
 
-        logger.info("Get on: " + tableName + " -> " + rowKey + " " + colFamily + ":" + col);
-        HTable theTable = new HTable(hConfig, tableName);
-        Get g = new Get(Bytes.toBytes(rowKey));
-        Result r = theTable.get(g);
-        byte[] value = r.getValue(Bytes.toBytes(colFamily), Bytes.toBytes(col));
-        String strVal = Bytes.toString(value);
-        theTable.close();
-        return strVal;
+        String retVal = "";
+        try {
+            logger.info("Get on: " + tableName + " -> " + rowKey + " " + colFamily + ":" + col);
+            HTable theTable = new HTable(hConfig, tableName);
+            Get g = new Get(Bytes.toBytes(rowKey));
+            Result r = theTable.get(g);
+            byte[] value = r.getValue(Bytes.toBytes(colFamily), Bytes.toBytes(col));
+            retVal = Bytes.toString(value);
+            theTable.close();
+        } catch (Exception ex) {
+            logger.info("Exception while get: " + ex.toString());
+        }
+        return retVal;
     }
 }
